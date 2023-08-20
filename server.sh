@@ -46,14 +46,18 @@ if ! command -v virtualenv &> /dev/null; then
 fi
 sudo apt install postgresql postgresql-contrib -y
 sudo systemctl start postgresql.service
-sudo -u postgres psql
+# Run PostgreSQL commands as the postgres user
+sudo -u postgres psql << EOF
 CREATE DATABASE $DATABASE;
 CREATE USER $USER WITH PASSWORD 'root';
 ALTER ROLE $USER SET client_encoding TO 'utf8';
 ALTER ROLE $USER SET default_transaction_isolation TO 'read committed';
 ALTER ROLE $USER SET timezone TO 'UTC';
 GRANT ALL PRIVILEGES ON DATABASE $DATABASE TO $USER;
-\q
+EOF
+
+echo "PostgreSQL setup complete!"
+
 # Create a virtual environment using virtualenv
 virtualenv $VIRTUAL_ENV_DIR/venv
 
